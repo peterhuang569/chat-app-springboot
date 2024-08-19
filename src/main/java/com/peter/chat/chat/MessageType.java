@@ -1,0 +1,7 @@
+package com.peter.chat.chat;
+
+public enum MessageType {
+    CHAT,
+    JOIN,
+    LEAVE
+}
