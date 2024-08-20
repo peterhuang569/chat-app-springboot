@@ -33,6 +33,10 @@ function connect(event) {
 
 
 function onConnected() {
+    // Fetch previous messages from the backend
+    console.log(123981123);
+    fetchPreviousMessages();
+
     // Subscribe to the Public Topic
     stompClient.subscribe('/topic/public', onMessageReceived);
 
@@ -40,9 +44,60 @@ function onConnected() {
     stompClient.send("/app/chat.addUser",
         {},
         JSON.stringify({sender: username, messageType: 'JOIN'})
-    )
+    );
 
     connectingElement.classList.add('hidden');
+}
+
+function fetchPreviousMessages() {
+
+    fetch('/api/messages')  // Adjust the endpoint to match your backend API
+        .then(response => response.json())
+        .then(messages => {
+            messages.forEach(message => {
+                displayMessage(message);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching previous messages:', error);
+            connectingElement.textContent = 'Could not retrieve previous messages.';
+            connectingElement.style.color = 'red';
+        });
+}
+
+function displayMessage(message) {
+    var messageElement = document.createElement('li');
+
+    if(message.messageType === 'JOIN') {
+        messageElement.classList.add('event-message');
+        message.content = message.sender + ' joined!';
+    } else if (message.messageType === 'LEAVE') {
+        messageElement.classList.add('event-message');
+        message.content = message.sender + ' left!';
+    } else {
+        messageElement.classList.add('chat-message');
+
+        var avatarElement = document.createElement('i');
+        var avatarText = document.createTextNode(message.sender[0]);
+        avatarElement.appendChild(avatarText);
+        avatarElement.style['background-color'] = getAvatarColor(message.sender);
+
+        messageElement.appendChild(avatarElement);
+
+        var usernameElement = document.createElement('span');
+        var usernameText = document.createTextNode(message.sender);
+        usernameElement.appendChild(usernameText);
+        messageElement.appendChild(usernameElement);
+    }
+
+    var textElement = document.createElement('p');
+    var messageText = document.createTextNode(message.content);
+    textElement.appendChild(messageText);
+
+    messageElement.appendChild(textElement);
+
+    messageArea.appendChild(messageElement);
+    messageArea.scrollTop = messageArea.scrollHeight;
 }
 
 
@@ -113,6 +168,8 @@ function getAvatarColor(messageSender) {
     var index = Math.abs(hash % colors.length);
     return colors[index];
 }
+
+
 
 usernameForm.addEventListener('submit', connect, true)
 messageForm.addEventListener('submit', sendMessage, true)
