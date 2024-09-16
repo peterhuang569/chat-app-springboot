@@ -2,7 +2,7 @@ services:
   app:
     container_name: app
     image: peter/chat-app:1.0.0
-    build: .
+    build: backend
     ports:
       - 8080:8080
     environment:

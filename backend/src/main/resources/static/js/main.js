@@ -34,7 +34,6 @@ function connect(event) {
 
 function onConnected() {
     // Fetch previous messages from the backend
-    console.log(123981123);
     fetchPreviousMessages();
 
     // Subscribe to the Public Topic
