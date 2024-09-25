@@ -26,11 +26,14 @@ const ChatApp = () => {
   };
 
   const connect = () => {
-    const socket = new SockJS('/ws');
-    const stompClient = Stomp.over(socket);
-    stompClient.connect({}, onConnected, onError);
-    setStompClient(stompClient);
+    if (username && !stompClient) { // Only connect if stompClient is null
+      const socket = new SockJS('http://backend:8080/ws');
+      const stompClientInstance = Stomp.over(socket);
+      stompClientInstance.connect({}, onConnected, onError);
+      setStompClient(stompClientInstance);
+    }
   };
+  
 
   const onConnected = () => {
     stompClient.subscribe('/topic/public', onMessageReceived);
